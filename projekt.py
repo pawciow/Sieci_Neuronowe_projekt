@@ -43,40 +43,29 @@ X_train_std = sc.transform(X_train)
 X_test_std = sc.transform(X_test)
 
 #%% [markdown] 
-# Jako pierwszy model zaimplementuję sieć używającą DecisionTreeClasifier
-
+# ## Dobór parametrów modelu
+#
+# Do wybrania funkcji aktywacji użyliśmy kolejno wszystkich możliwych i wybraliśmy funkcję, która 
+# daje najlepsze rezultaty.
+# 
+# Za solver wybraliśmy parametr 'lbfgs' , ponieważ jest on zalecany do mniejszych datasetów
+#
+#
+# TODO: POMYŚLEC NAD alpha : float, optional, default 0.0001
+# 
+# Parametrów: learning_rate_init, power_t, shuffle, momentum, nesterovs_momentum, early_stopping, validation_fraction, beta_1, beta_2, epsilon, n_iter_no_change nie używaliśmy. 
+# Wykluczają się one z naszym solverem. 
 #%%
-# DecisionTreeClasifier
-from sklearn import tree
-classifier = tree.DecisionTreeClassifier()
-classifier.fit(X_train, y_train)
-# Sprawdzanie dokładności
-confidence = classifier.score(X_test, y_test)
+# oszacowanie aktywacji
+from sklearn.neural_network import MLPClassifier
+activations = ['identity', 'logistic', 'tanh', 'relu']
+for item in activations:
+    classifier = MLPClassifier(solver='lbfgs', alpha=1e-5,activation=item,
+                               hidden_layer_sizes=(100), random_state=1,
+                               )
+    classifier.fit(X_train_std,y_train)
+    print('Training set score: {} %'.format(classifier.score(X_train_std,y_train)*100))
+    print('Training set loss: {} %'.format(classifier.loss_*100))
+    # classifier.predict(x)
+    # classifier.predict()
 
-#%% [markdown]
-# ## Wyniki dla drzewa decyzyjnego#
-print('Wyniki dla klasyfikatora drzewa decyzyjnego:{}'.format(confidence*100))
-
-#%% [markdown]
-# ## Wyniki z poprzednich prób:
-#
-# Dla podziału 70%-30%:
-# 56.46%, 56.53%, 56.25%, 59.25%
-#
-# Dla podziału 80%-20%:
-# 60.00%, 59.08%, 59.79%, 61.93%
-#
-# Dla podziału 90%-10%:
-# 56.12%, 56.12%, 58.97%, 64.69%
-#
-#%%
-# ## Graf:
-import graphviz 
-dot_data = tree.export_graphviz(classifier, out_file=None) 
-graph = graphviz.Source(dot_data) 
-graph.render("DecisionTreeClasifier")
-dot_data = tree.export_graphviz(classifier, out_file=None, 
-                     filled=True, rounded=True,  
-                     special_characters=True)  
-graph = graphviz.Source(dot_data)  
-graph
