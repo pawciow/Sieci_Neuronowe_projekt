@@ -61,11 +61,12 @@ from sklearn.neural_network import MLPClassifier
 activations = ['identity', 'logistic', 'tanh', 'relu']
 for item in activations:
     classifier = MLPClassifier(solver='lbfgs', alpha=1e-5,activation=item,
-                               hidden_layer_sizes=(100), random_state=1,
-                               )
+                               hidden_layer_sizes=(500,100), random_state=1,
+                               max_iter=1000)
     classifier.fit(X_train_std,y_train)
     print('Training set score: {} %'.format(classifier.score(X_train_std,y_train)*100))
     print('Training set loss: {} %'.format(classifier.loss_*100))
+    print('Test accuracy: {}%'.format(classifier.score(X_test_std,y_test)*100))
     # classifier.predict(x)
     # classifier.predict()
 
