@@ -1,7 +1,0 @@
-{
-    "python.pythonPath": "C:\\Users\\Pawel\\AppData\\Local\\Programs\\Python\\Python37\\python.exe",
-    "python.linting.pylintEnabled": false,
-    "python.linting.enabled": false,
-    "python.linting.pylamaEnabled": false,
-    "python.linting.banditEnabled": true
-}
