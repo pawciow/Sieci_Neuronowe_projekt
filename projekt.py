@@ -8,7 +8,8 @@ import numpy as np
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn import preprocessing
-data = pd.read_csv('winequality//winequality-white.csv', sep=';')
+from sklearn.datasets import load_wine # todo: THIS
+data = pd.read_csv('winequality//winequality-red.csv', sep=';')
 
 #%% [markdown]
 # ## Wektor danych wejściowych
@@ -48,8 +49,9 @@ X_test_std = sc.transform(X_test)
 # Do wybrania funkcji aktywacji użyliśmy kolejno wszystkich możliwych i wybraliśmy funkcję, która 
 # daje najlepsze rezultaty.
 # 
-# Za solver wybraliśmy parametr 'lbfgs' , ponieważ jest on zalecany do mniejszych datasetów
+# Za solver wybraliśmy parametr 'adam' , ponieważ jest on zalecany do mniejszych datasetów
 #
+#  dla 'lbfgs' otrzymywaliśmy wyniki na poziomie 65%
 #
 # TODO: POMYŚLEC NAD alpha : float, optional, default 0.0001
 # 
@@ -58,15 +60,34 @@ X_test_std = sc.transform(X_test)
 #%%
 # oszacowanie aktywacji
 from sklearn.neural_network import MLPClassifier
-activations = ['identity', 'logistic', 'tanh', 'relu']
-for item in activations:
-    classifier = MLPClassifier(solver='lbfgs', alpha=1e-5,activation=item,
-                               hidden_layer_sizes=(500,100), random_state=1,
+from sklearn.metrics import accuracy_score
+import matplotlib.pyplot as plt
+# activations = ['identity', 'logistic', 'tanh', 'relu']
+activations = ['tanh','relu']
+params, scores = [],[]
+for a in range(-5,6):
+    classifier = MLPClassifier(solver='adam', alpha=10**a,activation='relu',
+                               hidden_layer_sizes=(50,25,10,5), random_state=1,
                                max_iter=1000)
     classifier.fit(X_train_std,y_train)
     print('Training set score: {} %'.format(classifier.score(X_train_std,y_train)*100))
     print('Training set loss: {} %'.format(classifier.loss_*100))
     print('Test accuracy: {}%'.format(classifier.score(X_test_std,y_test)*100))
+    # yPredMLP = classifier.predict(X_test_std)
+    # print('NEWTESTING: {}'.format(yPredMLP))
+    classifier.fit(X_train_std, y_train)
+    yPredMLP = classifier.predict(X_test_std)
+    score = accuracy_score(y_test,yPredMLP)
+    params.append(classifier.alpha)
+    scores.append(score)
+plt.plot(params,scores,linestyle='--',color='blue', label='MLP')
+plt.legend(loc='lower right')
+plt.xscale('log')
+plt.xlabel('parameter values')
+plt.ylabel('Accuracy')
+plt.title('Accuracy scores')
+plt.show()
+
     # classifier.predict(x)
     # classifier.predict()
 
